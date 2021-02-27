@@ -1,11 +1,28 @@
 def f21(x):
-    if x[3] == 1960:
-        return 12
-    elif x[3] == 1999:
+    if x[3] == 1999:
         return 11
+    elif x[3] == 1960:
+        return 12
     elif x[3] == 1973:
         if x[0] == 1996:
             return 6
+        # x[0] UP
+        elif x[0] == 2004:
+            if x[2] == 2018:
+                return 5
+            elif x[2] == 1982:
+                if x[1] == 2017:
+                    return 0
+                elif x[1] == 1963:
+                    return 1
+            elif x[2] == 2003:
+                if x[4] == 1995:
+                    return 2
+                elif x[4] == 1964:
+                    return 3
+                elif x[4] == 1974:
+                    return 4
+        # x[0] down
         elif x[0] == 2019:
             if x[4] == 1995:
                 return 7
@@ -16,20 +33,6 @@ def f21(x):
                     return 8
                 elif x[1] == 1963:
                     return 9
-        elif x[0] == 2004:
-            if x[2] == 2018:
-                return 5
-            elif x[4] == 1995:
-                return 2
-            elif x[4] == 1964:
-                return 3
-            elif x[4] == 1974:
-                return 4
-            elif x[1] == 2017:
-                return 0
-            elif x[1] == 1963:
-                return 1
-
 
 def f22(x):
     res = 0
@@ -126,6 +129,8 @@ table2 = [[None, None, "08.05.02", "grigorij80@gmail.ru", "Григорий Ш. 
           [None, None, None, None, None],
           [None, None, "05.11.00", "daniel_48@yahoo.ru", "Даниэль Ф. Шекьан"]
           ]
+if __name__ == '__main__':
 
-print(f23(table1))
-print(f23(table2))
+    # print(f21([2019, 1963, 2018, 1973, 1964]))
+    # print(f21([2019, 1963, 2003, 1999, 1964]))
+    print(f23(table1))
