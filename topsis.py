@@ -3,6 +3,7 @@ import math
 
 class Topsis:
     def __init__(self, start_matrix, benefits, weights):
+        print("Topsis method")
         self.__start_matrix = start_matrix
         self.__benefits = benefits
         self.__weights = weights
@@ -10,7 +11,7 @@ class Topsis:
 
     def calc(self):
         normalization_matrix = []
-        temp = []
+        tmp = []
         squared_matrix = []
         sqrt_sum = []
         weighted_matrix = []
@@ -29,9 +30,9 @@ class Topsis:
         # Считаем матрицу квадратичных значений
         for i in range(0, m):
             for j in range(n):
-                temp.append(self.__start_matrix[i][j] ** 2)
-            squared_matrix.append(temp.copy())
-            temp.clear()
+                tmp.append(self.__start_matrix[i][j] ** 2)
+            squared_matrix.append(tmp.copy())
+            tmp.clear()
 
         # Считаем корни сумм
         _sum = 0
@@ -44,16 +45,16 @@ class Topsis:
         # Нормализуем матрицу
         for i in range(0, n):
             for j in range(0, m):
-                temp.append(self.__start_matrix[j][i] / sqrt_sum[i])
-            normalization_matrix.append(temp.copy())
-            temp.clear()
+                tmp.append(self.__start_matrix[j][i] / sqrt_sum[i])
+            normalization_matrix.append(tmp.copy())
+            tmp.clear()
 
         # Взвешиваем нормализованную матрицу
         for i in range(0, n):
             for j in range(0, m):
-                temp.append(normalization_matrix[i][j] * self.__weights[i])
-            weighted_matrix.append(temp.copy())
-            temp.clear()
+                tmp.append(normalization_matrix[i][j] * self.__weights[i])
+            weighted_matrix.append(tmp.copy())
+            tmp.clear()
 
         print("\nВзвешенная матрица:")
         print(weighted_matrix)
