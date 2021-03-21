@@ -2,146 +2,106 @@ import math
 
 
 class Topsis:
-
-    def __init__(self, start_matrix):
+    def __init__(self, start_matrix, benefits, weights):
         self.__start_matrix = start_matrix
+        self.__benefits = benefits
+        self.__weights = weights
         self.__rank = []
 
     def calc(self):
-        start_matrix = self.__start_matrix
-        n = len(start_matrix)
-        m = len(start_matrix[0])
-        matrix = []
-        wight_matrix = []
         normalization_matrix = []
+        temp = []
         squared_matrix = []
-        sum_list = []
+        sqrt_sum = []
+        weighted_matrix = []
         positive_matrix = []
         negative_matrix = []
-        major_values = []
-        tmp = []
         si_pos = []
         si_neg = []
         cci = []
-        rank = []
-        # Init start matrix
-        for i in range(1, n):
-            for j in range(m):
-                if start_matrix[i][j] != '':
-                    tmp.append(start_matrix[i][j])
-                else:
-                    break
-            matrix.append(tmp.copy())
-            tmp.clear()
-        # print(matrix)
-        start_m = len(matrix[0]) + 1
-        # print(f"n: {n}, m: {m}, start_m: {start_m}")
-        # init wight matrix
-        for i in range(1, n):
-            for j in range(start_m, m):
-                tmp.append(start_matrix[i][j])
-            wight_matrix.append(tmp.copy())
-            tmp.clear()
-        # print(wight_matrix)
-        tmp.clear()
 
-        for j in range(m):
-            if start_matrix[0][j] != "":
-                major_values.append(start_matrix[0][j])
-        print(major_values)
+        print("Начальная матрица:")
+        print(self.__start_matrix)
 
-        m = len(matrix[0])
-        n = len(matrix)
-        for i in range(n):
-            for j in range(m):
-                tmp.append(matrix[i][j] ** 2)
-            squared_matrix.append(tmp.copy())
-            tmp.clear()
+        # Размерность матрицы
+        m = len(self.__start_matrix)
+        n = len(self.__start_matrix[0])
+        # Считаем матрицу квадратичных значений
+        for i in range(0, m):
+            for j in range(n):
+                temp.append(self.__start_matrix[i][j] ** 2)
+            squared_matrix.append(temp.copy())
+            temp.clear()
 
-        # print("Sq")
-        # print(squared_matrix)
-        sum_sqrted = 0
+        # Считаем корни сумм
+        _sum = 0
+        for i in range(0, n):
+            for j in range(0, m):
+                _sum += squared_matrix[j][i]
+            sqrt_sum.append(math.sqrt(_sum))
+            _sum = 0
+
+        # Нормализуем матрицу
+        for i in range(0, n):
+            for j in range(0, m):
+                temp.append(self.__start_matrix[j][i] / sqrt_sum[i])
+            normalization_matrix.append(temp.copy())
+            temp.clear()
+
+        # Взвешиваем нормализованную матрицу
+        for i in range(0, n):
+            for j in range(0, m):
+                temp.append(normalization_matrix[i][j] * self.__weights[i])
+            weighted_matrix.append(temp.copy())
+            temp.clear()
+
+        print("\nВзвешенная матрица:")
+        print(weighted_matrix)
+
+        # Считаем pos и neg относительно важности каждого критерия
+        for i in range(len(weighted_matrix)):
+            if self.__benefits[i] == 1.0:
+                positive_matrix.append(max(weighted_matrix[i]))
+            if self.__benefits[i] == 0.0:
+                positive_matrix.append(min(weighted_matrix[i]))
+        for i in range(len(weighted_matrix)):
+            if self.__benefits[i] == 1.0:
+                negative_matrix.append(min(weighted_matrix[i]))
+            if self.__benefits[i] == 0.0:
+                negative_matrix.append(max(weighted_matrix[i]))
+
+        _sum = 0
+        # Считаем Si pos и Si net
         for i in range(m):
             for j in range(n):
-                sum_sqrted += squared_matrix[j][i]
-            # print(f"sum: {sum_sqrted}")
-            sum_list.append(math.sqrt(sum_sqrted))
-            sum_sqrted = 0
-        # print("Sums")
-        # print(sum_list)
+                _sum += (weighted_matrix[j][i] - positive_matrix[j]) ** 2
+            si_pos.append(math.sqrt(_sum))
+            _sum = 0
 
-        for i in range(n):
-            for j in range(m):
-                x = matrix[i][j]
-                res = x / (sum_list[j])
-                tmp.append(res)
-            normalization_matrix.append(tmp.copy())
-            tmp.clear()
-
-        # print("Norm")
-        # print(normalization_matrix)
-
-        for i in range(n):
-            for j in range(m):
-                normalization_matrix[i][j] *= wight_matrix[i][j]
-
-        print("Wieghted Norm")
-        print(normalization_matrix)
-
-        t_nmatrix = list(zip(*normalization_matrix))
-        max_ = 0
-        for i in range(len(major_values)):
-            if major_values[i] == 1.0:
-                positive_matrix.append(min(t_nmatrix[i]))
-            if major_values[i] == 0.0:
-                positive_matrix.append(max(t_nmatrix[i]))
-        for i in range(len(major_values)):
-            if major_values[i] == 1.0:
-                negative_matrix.append(max(t_nmatrix[i]))
-            if major_values[i] == 0.0:
-                negative_matrix.append(min(t_nmatrix[i]))
-        # print("Transpose")
-        # print(t_nmatrix)
-        print("Pos")
-        print(positive_matrix)
-        print("Neg")
-        print(negative_matrix)
-        sum_ = 0
-
-        for i in range(n):
-            for j in range(m):
-                sum_ += ((round(normalization_matrix[i][j], 2) - round(positive_matrix[j], 2)) ** 2)
-            si_pos.append(math.sqrt(sum_))
-            sum_ = 0
-
-        print("Si pos")
+        print("\nSi positive:")
         print(si_pos)
 
-        for i in range(n):
-            for j in range(m):
-                sum_ += ((round(normalization_matrix[i][j], 2) - round(negative_matrix[j], 2)) ** 2)
-            si_neg.append(math.sqrt(sum_))
-            sum_ = 0
+        for i in range(m):
+            for j in range(n):
+                _sum += (weighted_matrix[j][i] - negative_matrix[j]) ** 2
+            si_neg.append(math.sqrt(_sum))
+            _sum = 0
 
-        print("Si neg")
+        print("\nSi negative:")
         print(si_neg)
 
-        # cci
-        sum_ = 0
-        for i in range(len(si_pos)):
-            sum_ = si_neg[i] / (si_pos[i] + si_neg[i])
-            cci.append(sum_)
-            sum_ = 0
+        for i in range(len(si_neg)):
+            cci.append(si_neg[i] / (si_pos[i] + si_neg[i]))
 
-        print("CCI")
+        print("\nФинальная матрица")
         print(cci)
-        cci_copy = cci.copy()
-        for i in range(len(cci)):
-            max_ = max(cci_copy)
-            for j in range(len(cci)):
-                if max_ == cci[j]:
-                    rank.append(j + 1)
-            cci_copy.remove(max_)
+        d = {}
+        for i in range(1, len(cci) + 1):
+            d[i] = cci[i - 1]
 
-        print("Rank")
-        print(rank)
+        def compare(index):
+            return d[index]
+        self.__rank = sorted(d, key=compare, reverse=True)
+
+        print("\nРанг")
+        print(self.__rank)
